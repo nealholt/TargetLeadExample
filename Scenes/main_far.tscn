@@ -1,0 +1,91 @@
+[gd_scene load_steps=13 format=3 uid="uid://dmt5wndx6vsuc"]
+
+[ext_resource type="Texture2D" uid="uid://usvhu3lra10b" path="res://Assets/prototype-texture-with-size.png" id="1_505wl"]
+[ext_resource type="PackedScene" uid="uid://dvb0jr82kdc7x" path="res://Scenes/gun.tscn" id="2_occj5"]
+[ext_resource type="PackedScene" uid="uid://1v8of7k1s831" path="res://Scenes/bullet_character.tscn" id="3_25v43"]
+[ext_resource type="Script" path="res://Scripts/MovingTarget.gd" id="4_r8ltb"]
+[ext_resource type="PackedScene" uid="uid://bkcabw3dsa5mp" path="res://Assets/targetA.glb" id="5_5wxv5"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rkfy3"]
+sky_top_color = Color(0.321569, 0.584314, 0.745098, 1)
+sky_horizon_color = Color(0.630392, 0.688235, 0.719608, 1)
+ground_bottom_color = Color(0.2, 0.168627, 0.133333, 1)
+ground_horizon_color = Color(0.630392, 0.688235, 0.719608, 1)
+
+[sub_resource type="Sky" id="Sky_8eqva"]
+sky_material = SubResource("ProceduralSkyMaterial_rkfy3")
+
+[sub_resource type="Environment" id="Environment_xmxcl"]
+background_mode = 2
+sky = SubResource("Sky_8eqva")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tltif"]
+albedo_texture = ExtResource("1_505wl")
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jw2s5"]
+albedo_texture = ExtResource("1_505wl")
+uv1_triplanar = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cx1y0"]
+size = Vector3(1, 20, 40)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jndct"]
+height = 0.2
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xmxcl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+light_color = Color(1, 1, 0.85098, 1)
+shadow_enabled = true
+
+[node name="ShootingGallery" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="ShootingGallery"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+material_override = SubResource("StandardMaterial3D_tltif")
+use_collision = true
+size = Vector3(405, 1, 405)
+
+[node name="Wall50m" type="CSGBox3D" parent="ShootingGallery"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.5, 10, 0)
+material_override = SubResource("StandardMaterial3D_jw2s5")
+use_collision = true
+size = Vector3(1, 20, 40)
+
+[node name="Area3D" type="Area3D" parent="ShootingGallery/Wall50m"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ShootingGallery/Wall50m/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -9.53674e-07, 0)
+shape = SubResource("BoxShape3D_cx1y0")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 3, 0)
+
+[node name="Gun" parent="Camera3D" node_paths=PackedStringArray("target") instance=ExtResource("2_occj5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.336033, -0.228719, -0.569553)
+bullet = ExtResource("3_25v43")
+fire_rate = 10.0
+target = NodePath("../../TargetFar")
+lead_target = true
+
+[node name="TargetFar" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.7183, 3.38642, -17.0296)
+script = ExtResource("4_r8ltb")
+move_x = false
+
+[node name="targetA2" parent="TargetFar" instance=ExtResource("5_5wxv5")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetFar"]
+transform = Transform3D(-1.5299e-08, -0.35, 0, 0.35, -1.5299e-08, 0, 0, 0, 0.35, 0, 0, 0)
+shape = SubResource("CylinderShape3D_jndct")
+
+[node name="TargetCam" type="Camera3D" parent="TargetFar"]
+transform = Transform3D(-0.231205, 0, 0.972905, 0, 1, 0, -0.972905, 0, -0.231205, 2.56496, -0.341131, -0.707493)
+current = true

@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://cw7fjpcah2wjo"]
+
+[ext_resource type="Script" path="res://Scripts/bullet.gd" id="1_d6432"]
+[ext_resource type="PackedScene" uid="uid://lrdu3hcm1uc3" path="res://Scenes/decal.tscn" id="2_uyu7k"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_l4kbh"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_omv2o"]
+albedo_color = Color(1, 0.243137, 0.152941, 1)
+emission_enabled = true
+emission = Color(1, 0.243137, 0.152941, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lxhat"]
+
+[node name="Bullet" type="Area3D"]
+script = ExtResource("1_d6432")
+bullet_hole_decal = ExtResource("2_uyu7k")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+shape = SubResource("SphereShape3D_l4kbh")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+autostart = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.2, 0, 0, 0, -8.74228e-09, -0.2, 0, 0.2, -8.74228e-09, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_omv2o")
+mesh = SubResource("CylinderMesh_lxhat")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

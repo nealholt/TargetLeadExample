@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3 uid="uid://dvb0jr82kdc7x"]
+
+[ext_resource type="Script" path="res://Scripts/gun.gd" id="1_hn3bi"]
+[ext_resource type="PackedScene" uid="uid://bydjrj4avgyjd" path="res://Assets/blasterF.glb" id="2_lr0gd"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pd6w8"]
+direction = Vector3(0, 0, 1)
+spread = 20.0
+initial_velocity_min = 20.0
+initial_velocity_max = 20.0
+gravity = Vector3(0, 0, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6w08a"]
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_1wg7i"]
+material = SubResource("StandardMaterial3D_6w08a")
+size = Vector3(0.1, 0.1, 0.1)
+
+[node name="Gun" type="Node3D"]
+script = ExtResource("1_hn3bi")
+
+[node name="blasterF2" parent="." instance=ExtResource("2_lr0gd")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="BulletSpawnLoc" type="Node3D" parent="blasterF2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0698825, 0.633784)
+
+[node name="MuzzleFlash" type="GPUParticles3D" parent="blasterF2/BulletSpawnLoc"]
+visible = false
+emitting = false
+amount = 16
+lifetime = 0.05
+one_shot = true
+explosiveness = 0.82
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_pd6w8")
+draw_pass_1 = SubResource("BoxMesh_1wg7i")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

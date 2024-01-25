@@ -1,0 +1,105 @@
+[gd_scene load_steps=15 format=3 uid="uid://dw4my5kiivga7"]
+
+[ext_resource type="Texture2D" uid="uid://usvhu3lra10b" path="res://Assets/prototype-texture-with-size.png" id="1_fsgui"]
+[ext_resource type="PackedScene" uid="uid://dvb0jr82kdc7x" path="res://Scenes/gun.tscn" id="1_q3ehr"]
+[ext_resource type="Script" path="res://Scripts/MovingTarget.gd" id="2_n58kk"]
+[ext_resource type="PackedScene" uid="uid://bkcabw3dsa5mp" path="res://Assets/targetA.glb" id="3_0mvju"]
+[ext_resource type="PackedScene" uid="uid://1v8of7k1s831" path="res://Scenes/bullet_character.tscn" id="3_t2m02"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rkfy3"]
+sky_top_color = Color(0.321569, 0.584314, 0.745098, 1)
+sky_horizon_color = Color(0.630392, 0.688235, 0.719608, 1)
+ground_bottom_color = Color(0.2, 0.168627, 0.133333, 1)
+ground_horizon_color = Color(0.630392, 0.688235, 0.719608, 1)
+
+[sub_resource type="Sky" id="Sky_8eqva"]
+sky_material = SubResource("ProceduralSkyMaterial_rkfy3")
+
+[sub_resource type="Environment" id="Environment_xmxcl"]
+background_mode = 2
+sky = SubResource("Sky_8eqva")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tltif"]
+albedo_texture = ExtResource("1_fsgui")
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dgfbu"]
+albedo_texture = ExtResource("1_fsgui")
+uv1_triplanar = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_j6bie"]
+size = Vector3(20, 10, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jw2s5"]
+albedo_texture = ExtResource("1_fsgui")
+uv1_triplanar = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cx1y0"]
+size = Vector3(1, 20, 40)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_a0i28"]
+height = 0.2
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xmxcl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+light_color = Color(1, 1, 0.85098, 1)
+shadow_enabled = true
+
+[node name="ShootingGallery" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="ShootingGallery"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+material_override = SubResource("StandardMaterial3D_tltif")
+use_collision = true
+size = Vector3(405, 1, 405)
+
+[node name="Wall10m" type="CSGBox3D" parent="ShootingGallery"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 10.5)
+material_override = SubResource("StandardMaterial3D_dgfbu")
+use_collision = true
+size = Vector3(20, 10, 1)
+
+[node name="Area3D" type="Area3D" parent="ShootingGallery/Wall10m"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ShootingGallery/Wall10m/Area3D"]
+shape = SubResource("BoxShape3D_j6bie")
+
+[node name="Wall50m" type="CSGBox3D" parent="ShootingGallery"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.5, 10, 0)
+material_override = SubResource("StandardMaterial3D_jw2s5")
+use_collision = true
+size = Vector3(1, 20, 40)
+
+[node name="Area3D" type="Area3D" parent="ShootingGallery/Wall50m"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ShootingGallery/Wall50m/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -9.53674e-07, 0)
+shape = SubResource("BoxShape3D_cx1y0")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 3, 0)
+current = true
+
+[node name="Gun" parent="Camera3D" node_paths=PackedStringArray("target") instance=ExtResource("1_q3ehr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.336033, -0.228719, -0.569553)
+bullet = ExtResource("3_t2m02")
+fire_rate = 10.0
+target = NodePath("../../Target")
+
+[node name="Target" type="CharacterBody3D" parent="."]
+transform = Transform3D(-2.18557e-07, 0, 5, 0, 5, 0, -5, 0, -2.18557e-07, -9.87572, 3.44716, 9.07433)
+script = ExtResource("2_n58kk")
+speed = 200.0
+
+[node name="targetA2" parent="Target" instance=ExtResource("3_0mvju")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Target"]
+transform = Transform3D(-1.5299e-08, -0.35, 0, 0.35, -1.5299e-08, 0, 0, 0, 0.35, 0, 0, 0)
+shape = SubResource("CylinderShape3D_a0i28")
