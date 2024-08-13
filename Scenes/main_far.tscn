@@ -89,3 +89,4 @@ shape = SubResource("CylinderShape3D_jndct")
 
 [node name="TargetCam" type="Camera3D" parent="TargetFar"]
 transform = Transform3D(-0.231205, 0, 0.972905, 0, 1, 0, -0.972905, 0, -0.231205, 2.56496, -0.341131, -0.707493)
+current = true

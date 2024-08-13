@@ -74,12 +74,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.336033, -0.228719, -0.56955
 bullet = ExtResource("3_6lyw4")
 fire_rate = 10.0
 target = NodePath("../../TargetFar")
-lead_target = true
 bullet_drop = -9.8
 
 [node name="TargetFar" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.7183, 3.38642, -17.0296)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.718, 12.842, -17.03)
 script = ExtResource("4_f8ylg")
+speed = 0.0
 move_x = false
 
 [node name="targetA2" parent="TargetFar" instance=ExtResource("5_xdn8q")]
@@ -89,4 +89,4 @@ transform = Transform3D(-1.5299e-08, -0.35, 0, 0.35, -1.5299e-08, 0, 0, 0, 0.35,
 shape = SubResource("CylinderShape3D_jndct")
 
 [node name="TargetCam" type="Camera3D" parent="TargetFar"]
-transform = Transform3D(-0.231205, 0, 0.972905, 0, 1, 0, -0.972905, 0, -0.231205, 2.56496, -0.341131, -0.707493)
+transform = Transform3D(-0.935259, 0, 0.353964, 0, 1, 0, -0.353964, 0, -0.935259, 8.12797, -0.55816, -4.44697)

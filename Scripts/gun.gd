@@ -6,6 +6,7 @@ var projectile_speed : float
 @export var target : Node3D
 @export var lead_target: bool = false
 @export var bullet_drop := 0.0
+var elevation_angle : float = 0.0 # For compensating for bullet drop
 
 @onready var timer: Timer = $Timer
 @onready var bullet_spawn_loc: Node3D = $blasterF2/BulletSpawnLoc
@@ -24,14 +25,21 @@ func _ready():
 func _physics_process(_delta: float) -> void:
 	var target_pos := target.global_position
 	if lead_target:
-		#var angle := acos(target.velocity.length() / projectile_speed) #ADDED
-		#print(angle)
 		target_pos = get_intercept(
 			bullet_spawn_loc.global_position,
-			projectile_speed,
+			projectile_speed * cos(elevation_angle), #CHANGED
 			target.global_position,
 			target.velocity)
 	look_at(target_pos, Vector3.UP)
+	#Account for bullet drop # ADDED
+	if bullet_drop != 0.0: # ADDED
+		#print('') #ADDED
+		#print(target.velocity.length()) #ADDED
+		#print(projectile_speed) #ADDED
+		#print(projectile_speed * cos(angle_to_target)) #ADDED
+		set_firing_angle() #ADDED
+		#print(rad_to_deg(angle_to_target)) #ADDED
+		rotate_x(elevation_angle) #ADDED
 	# Shoot automatically, as often as you can
 	#if Input.is_action_pressed("ui_accept"):
 	shoot()
@@ -59,6 +67,77 @@ func shoot() -> void:
 
 func _on_timer_timeout() -> void:
 	can_shoot = true
+
+
+func set_firing_angle(): #ADDED
+	# Avoid divide by zero
+	if bullet_drop == 0.0:
+		elevation_angle = 0.0
+		return
+	
+	# The following code is based on this:
+	# https://www.youtube.com/watch?v=bqYtNrhdDAY
+	# and the simpler, equal height, case is based
+	# on this:
+	# https://physics.stackexchange.com/questions/249321/angle-required-to-hit-the-target-in-projectile-motion
+	
+	# Get the height of the gun relative to the target.
+	# I don't know why I need -abs here, but all the
+	# tutorial videos I found had the shooter above
+	# the target and if the shooter is below and you
+	# don't use -abs, then the calculation doesn't work.
+	var h:float = -abs(bullet_spawn_loc.global_position.y - target.global_position.y)
+	
+	#TODO Whole other approach. Source:
+	# https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)
+	# Initial horizontal velocity
+	var v0:float = projectile_speed
+	# Horizontal distance, x
+	var tempx:float = bullet_spawn_loc.global_position.x - target.global_position.x
+	var tempz:float = bullet_spawn_loc.global_position.z - target.global_position.z
+	var x:float = sqrt(tempx**2 + tempz**2)
+	# Vertical distance y
+	var y:float = bullet_spawn_loc.global_position.y - target.global_position.y
+	# Gravity
+	var g:float = -bullet_drop #Negative needed
+	var angle1:float = atan( (v0**2 + sqrt(v0**4 - g*(g*x**2+2*y*v0**2))) / (g*x) )
+	var angle2:float = atan( (v0**2 - sqrt(v0**4 - g*(g*x**2+2*y*v0**2))) / (g*x) )
+	print(PI/2 - angle1)
+	#print(angle1)
+	print(angle2)
+	elevation_angle = PI/2 - angle1
+	#elevation_angle = angle1
+	#elevation_angle = angle2
+	
+	# If there is no difference in height, then do a
+	# simpler calculation and avoid another divide by zero
+	# Use   angle = arctan(v0**2/(g*x))
+	#print(h)
+	#if true: # h == 0 TODO
+		## Initial horizontal velocity
+		#var v0:float = projectile_speed * cos(elevation_angle)
+		## Gravity
+		#var g:float = -bullet_drop #Negative needed
+		## Horizontal distance, x
+		#var tempx:float = bullet_spawn_loc.global_position.x - target.global_position.x
+		#var tempz:float = bullet_spawn_loc.global_position.z - target.global_position.z
+		#var x:float = sqrt(tempx**2 + tempz**2)
+		#elevation_angle = PI/2 - atan( (v0**2) / (g*x) )
+	#else:
+		## Initial velocity
+		#var v0:float = projectile_speed
+		## Gravity
+		#var g:float = bullet_drop #No negative
+		## Horizontal distance, x
+		#var tempx:float = bullet_spawn_loc.global_position.x - target.global_position.x
+		#var tempz:float = bullet_spawn_loc.global_position.z - target.global_position.z
+		#var x = sqrt(tempx**2 + tempz**2)
+		## Various terms for organzation
+		#var phi:float = atan(x/h)
+		#var numerator:float = (g*x**2) / v0**2 - h
+		#var denominator:float = sqrt(h**2 + x**2)
+		#var answer_temp = acos( numerator/denominator )
+		#elevation_angle = (answer_temp + phi) / 2
 
 
 # Original source/inspiration:
