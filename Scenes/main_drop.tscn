@@ -1,10 +1,10 @@
-[gd_scene load_steps=13 format=3 uid="uid://dmt5wndx6vsuc"]
+[gd_scene load_steps=13 format=3 uid="uid://bkypf5w83fywq"]
 
-[ext_resource type="Texture2D" uid="uid://usvhu3lra10b" path="res://Assets/prototype-texture-with-size.png" id="1_505wl"]
-[ext_resource type="PackedScene" uid="uid://dvb0jr82kdc7x" path="res://Scenes/gun.tscn" id="2_occj5"]
-[ext_resource type="PackedScene" uid="uid://1v8of7k1s831" path="res://Scenes/bullet_character.tscn" id="3_25v43"]
-[ext_resource type="Script" path="res://Scripts/MovingTarget.gd" id="4_r8ltb"]
-[ext_resource type="PackedScene" uid="uid://bkcabw3dsa5mp" path="res://Assets/targetA.glb" id="5_5wxv5"]
+[ext_resource type="Texture2D" uid="uid://usvhu3lra10b" path="res://Assets/prototype-texture-with-size.png" id="1_fl7g8"]
+[ext_resource type="PackedScene" uid="uid://dvb0jr82kdc7x" path="res://Scenes/gun.tscn" id="2_flmvk"]
+[ext_resource type="PackedScene" uid="uid://1v8of7k1s831" path="res://Scenes/bullet_character.tscn" id="3_6lyw4"]
+[ext_resource type="Script" path="res://Scripts/MovingTarget.gd" id="4_f8ylg"]
+[ext_resource type="PackedScene" uid="uid://bkcabw3dsa5mp" path="res://Assets/targetA.glb" id="5_xdn8q"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rkfy3"]
 sky_top_color = Color(0.321569, 0.584314, 0.745098, 1)
@@ -22,11 +22,11 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tltif"]
-albedo_texture = ExtResource("1_505wl")
+albedo_texture = ExtResource("1_fl7g8")
 uv1_triplanar = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jw2s5"]
-albedo_texture = ExtResource("1_505wl")
+albedo_texture = ExtResource("1_fl7g8")
 uv1_triplanar = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cx1y0"]
@@ -69,19 +69,20 @@ shape = SubResource("BoxShape3D_cx1y0")
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 3, 0)
 current = true
 
-[node name="Gun" parent="Camera3D" node_paths=PackedStringArray("target") instance=ExtResource("2_occj5")]
+[node name="Gun" parent="Camera3D" node_paths=PackedStringArray("target") instance=ExtResource("2_flmvk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.336033, -0.228719, -0.569553)
-bullet = ExtResource("3_25v43")
+bullet = ExtResource("3_6lyw4")
 fire_rate = 10.0
 target = NodePath("../../TargetFar")
 lead_target = true
+bullet_drop = -9.8
 
 [node name="TargetFar" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.7183, 3.38642, -17.0296)
-script = ExtResource("4_r8ltb")
+script = ExtResource("4_f8ylg")
 move_x = false
 
-[node name="targetA2" parent="TargetFar" instance=ExtResource("5_5wxv5")]
+[node name="targetA2" parent="TargetFar" instance=ExtResource("5_xdn8q")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TargetFar"]
 transform = Transform3D(-1.5299e-08, -0.35, 0, 0.35, -1.5299e-08, 0, 0, 0, 0.35, 0, 0, 0)

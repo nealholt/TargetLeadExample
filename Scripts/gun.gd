@@ -5,6 +5,7 @@ var projectile_speed : float
 @export var fire_rate:= 2.0 # Shots per second
 @export var target : Node3D
 @export var lead_target: bool = false
+@export var bullet_drop := 0.0
 
 @onready var timer: Timer = $Timer
 @onready var bullet_spawn_loc: Node3D = $blasterF2/BulletSpawnLoc
@@ -23,6 +24,8 @@ func _ready():
 func _physics_process(_delta: float) -> void:
 	var target_pos := target.global_position
 	if lead_target:
+		#var angle := acos(target.velocity.length() / projectile_speed) #ADDED
+		#print(angle)
 		target_pos = get_intercept(
 			bullet_spawn_loc.global_position,
 			projectile_speed,
@@ -47,6 +50,9 @@ func shoot() -> void:
 		# Fire from the position and orientation of the gun
 		b.transform = bullet_spawn_loc.global_transform
 		b.origin = bullet_spawn_loc.global_position
+		b.set_movement_vector()
+		if "gravity" in b:
+			b.gravity = bullet_drop
 		# Reset the timer
 		timer.start(1.0/fire_rate)
 
