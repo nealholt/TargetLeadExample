@@ -67,7 +67,6 @@ shape = SubResource("BoxShape3D_cx1y0")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 3, 0)
-current = true
 
 [node name="Gun" parent="Camera3D" node_paths=PackedStringArray("target") instance=ExtResource("2_occj5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.336033, -0.228719, -0.569553)

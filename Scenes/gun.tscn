@@ -22,13 +22,15 @@ size = Vector3(0.1, 0.1, 0.1)
 [node name="Gun" type="Node3D"]
 script = ExtResource("1_hn3bi")
 
-[node name="blasterF2" parent="." instance=ExtResource("2_lr0gd")]
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="blasterF2" parent="Pivot" instance=ExtResource("2_lr0gd")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 
-[node name="BulletSpawnLoc" type="Node3D" parent="blasterF2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0698825, 0.633784)
+[node name="BulletSpawnLoc" type="Node3D" parent="Pivot/blasterF2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0.634)
 
-[node name="MuzzleFlash" type="GPUParticles3D" parent="blasterF2/BulletSpawnLoc"]
+[node name="MuzzleFlash" type="GPUParticles3D" parent="Pivot/blasterF2/BulletSpawnLoc"]
 visible = false
 emitting = false
 amount = 16

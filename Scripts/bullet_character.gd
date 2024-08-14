@@ -31,4 +31,4 @@ func stick_decal(collision: KinematicCollision3D) -> void:
 
 
 func set_movement_vector() -> void:
-	movement_vect = transform.basis.z * speed
+	movement_vect = transform.basis.z.normalized() * speed

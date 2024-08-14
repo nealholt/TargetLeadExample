@@ -9,8 +9,9 @@ var projectile_speed : float
 var elevation_angle : float = 0.0 # For compensating for bullet drop
 
 @onready var timer: Timer = $Timer
-@onready var bullet_spawn_loc: Node3D = $blasterF2/BulletSpawnLoc
-@onready var muzzle_flash: GPUParticles3D = $blasterF2/BulletSpawnLoc/MuzzleFlash
+@onready var bullet_spawn_loc: Node3D = $Pivot/blasterF2/BulletSpawnLoc
+@onready var muzzle_flash: GPUParticles3D = $Pivot/blasterF2/BulletSpawnLoc/MuzzleFlash
+@onready var pivot: Node3D = $Pivot
 
 var can_shoot: bool = false # For bullet firing rate
 
@@ -25,21 +26,28 @@ func _ready():
 func _physics_process(_delta: float) -> void:
 	var target_pos := target.global_position
 	if lead_target:
+		# If you don't care about bullet drop then
+		# elevation_angle should be zero and 
+		# cos(elevation_angle) should be one.
 		target_pos = get_intercept(
 			bullet_spawn_loc.global_position,
 			projectile_speed * cos(elevation_angle), #CHANGED
 			target.global_position,
 			target.velocity)
-	look_at(target_pos, Vector3.UP)
-	#Account for bullet drop # ADDED
-	if bullet_drop != 0.0: # ADDED
-		#print('') #ADDED
-		#print(target.velocity.length()) #ADDED
-		#print(projectile_speed) #ADDED
-		#print(projectile_speed * cos(angle_to_target)) #ADDED
-		set_firing_angle() #ADDED
-		#print(rad_to_deg(angle_to_target)) #ADDED
-		rotate_x(elevation_angle) #ADDED
+	# Face the target
+	if bullet_drop != 0.0:
+		# Account for bullet drop
+		# Look at target, but don't elevate toward it.
+		# This is rotating the gun, not the position where
+		# the bullet is instantiated.
+		var temp := Vector3(target_pos.x, global_position.y, target_pos.z)
+		look_at(temp, Vector3.UP)
+		set_firing_angle(target_pos)
+		pivot.rotation.x = elevation_angle
+	else:
+		# No bullet drop
+		pivot.rotation.x = 0
+		look_at(target_pos, Vector3.UP)
 	# Shoot automatically, as often as you can
 	#if Input.is_action_pressed("ui_accept"):
 	shoot()
@@ -69,75 +77,47 @@ func _on_timer_timeout() -> void:
 	can_shoot = true
 
 
-func set_firing_angle(): #ADDED
-	# Avoid divide by zero
+func set_firing_angle(target_pos:Vector3):
+	# Avoid divide by zero. Also there's no
+	# elevation needed if there's no bullet drop.
 	if bullet_drop == 0.0:
 		elevation_angle = 0.0
 		return
-	
 	# The following code is based on this:
-	# https://www.youtube.com/watch?v=bqYtNrhdDAY
-	# and the simpler, equal height, case is based
-	# on this:
-	# https://physics.stackexchange.com/questions/249321/angle-required-to-hit-the-target-in-projectile-motion
-	
-	# Get the height of the gun relative to the target.
-	# I don't know why I need -abs here, but all the
-	# tutorial videos I found had the shooter above
-	# the target and if the shooter is below and you
-	# don't use -abs, then the calculation doesn't work.
-	var h:float = -abs(bullet_spawn_loc.global_position.y - target.global_position.y)
-	
-	#TODO Whole other approach. Source:
 	# https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)
 	# Initial horizontal velocity
 	var v0:float = projectile_speed
 	# Horizontal distance, x
-	var tempx:float = bullet_spawn_loc.global_position.x - target.global_position.x
-	var tempz:float = bullet_spawn_loc.global_position.z - target.global_position.z
+	var tempx:float = bullet_spawn_loc.global_position.x - target_pos.x
+	var tempz:float = bullet_spawn_loc.global_position.z - target_pos.z
 	var x:float = sqrt(tempx**2 + tempz**2)
+	# Avoid divide by zero
+	if x == 0:
+		# In this case the target is either directly above
+		# or below. Here I assume above, but more thorough
+		# code would check and possibly set elevation_angle
+		# to PI/2
+		elevation_angle = PI/2
+		return
 	# Vertical distance y
-	var y:float = bullet_spawn_loc.global_position.y - target.global_position.y
+	var y:float = target_pos.y - bullet_spawn_loc.global_position.y
 	# Gravity
 	var g:float = -bullet_drop #Negative needed
+	# Avoid imaginary solutions
+	if v0**4 < g*(g*x**2+2*y*v0**2):
+		# No real solutions. Bullet cannot reach target
+		# so fire at a 45 degree angle.
+		elevation_angle = PI/4
+		return
+	# Solutions:
 	var angle1:float = atan( (v0**2 + sqrt(v0**4 - g*(g*x**2+2*y*v0**2))) / (g*x) )
 	var angle2:float = atan( (v0**2 - sqrt(v0**4 - g*(g*x**2+2*y*v0**2))) / (g*x) )
-	print(PI/2 - angle1)
-	#print(angle1)
-	print(angle2)
-	elevation_angle = PI/2 - angle1
-	#elevation_angle = angle1
-	#elevation_angle = angle2
-	
-	# If there is no difference in height, then do a
-	# simpler calculation and avoid another divide by zero
-	# Use   angle = arctan(v0**2/(g*x))
-	#print(h)
-	#if true: # h == 0 TODO
-		## Initial horizontal velocity
-		#var v0:float = projectile_speed * cos(elevation_angle)
-		## Gravity
-		#var g:float = -bullet_drop #Negative needed
-		## Horizontal distance, x
-		#var tempx:float = bullet_spawn_loc.global_position.x - target.global_position.x
-		#var tempz:float = bullet_spawn_loc.global_position.z - target.global_position.z
-		#var x:float = sqrt(tempx**2 + tempz**2)
-		#elevation_angle = PI/2 - atan( (v0**2) / (g*x) )
-	#else:
-		## Initial velocity
-		#var v0:float = projectile_speed
-		## Gravity
-		#var g:float = bullet_drop #No negative
-		## Horizontal distance, x
-		#var tempx:float = bullet_spawn_loc.global_position.x - target.global_position.x
-		#var tempz:float = bullet_spawn_loc.global_position.z - target.global_position.z
-		#var x = sqrt(tempx**2 + tempz**2)
-		## Various terms for organzation
-		#var phi:float = atan(x/h)
-		#var numerator:float = (g*x**2) / v0**2 - h
-		#var denominator:float = sqrt(h**2 + x**2)
-		#var answer_temp = acos( numerator/denominator )
-		#elevation_angle = (answer_temp + phi) / 2
+	#print(rad_to_deg(angle1))
+	#print(rad_to_deg(angle2))
+	elevation_angle = angle1
+	# Choose the smaller magnitude angle
+	if abs(angle2) < abs(angle1):
+		elevation_angle = angle2
 
 
 # Original source/inspiration:

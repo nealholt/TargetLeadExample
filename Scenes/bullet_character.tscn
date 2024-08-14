@@ -18,7 +18,7 @@ script = ExtResource("1_7rqp8")
 bullet_hole_decal = ExtResource("2_nddt4")
 
 [node name="Timer" type="Timer" parent="."]
-wait_time = 2.0
+wait_time = 15.0
 one_shot = true
 autostart = true
 
