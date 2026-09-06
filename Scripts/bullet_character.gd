@@ -1,10 +1,10 @@
 extends CharacterBody3D
 
 @export var bullet_hole_decal : PackedScene
-var speed := 50.0
+var speed :float = 50.0
 var origin:Vector3
-var gravity := 0.0
-var movement_vect := Vector3(0,0,1)
+var gravity :float = 0.0
+var movement_vect :Vector3 = Vector3(0,0,1)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -23,7 +23,7 @@ func _on_timer_timeout() -> void:
 
 func stick_decal(collision: KinematicCollision3D) -> void:
 	#Stick a decal on the target or on whatever was hit
-	var decal = bullet_hole_decal.instantiate()
+	var decal:Node3D = bullet_hole_decal.instantiate()
 	var body = collision.get_collider()
 	body.add_child(decal)
 	decal.global_position = collision.get_position()

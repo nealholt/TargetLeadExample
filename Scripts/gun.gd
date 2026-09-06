@@ -2,10 +2,10 @@ extends Node3D
 
 @export var bullet: PackedScene # What sort of bullet to fire
 var projectile_speed : float
-@export var fire_rate:= 2.0 # Shots per second
+@export var fire_rate:float = 2.0 # Shots per second
 @export var target : Node3D
 @export var lead_target: bool = false
-@export var bullet_drop := 0.0
+@export var bullet_drop :float = 0.0
 var elevation_angle : float = 0.0 # For compensating for bullet drop
 
 @onready var timer: Timer = $Timer
@@ -15,7 +15,7 @@ var elevation_angle : float = 0.0 # For compensating for bullet drop
 
 var can_shoot: bool = false # For bullet firing rate
 
-func _ready():
+func _ready() -> void:
 	timer.start(1.0/fire_rate)
 	# Create a bullet just to ask it for its speed
 	var b = bullet.instantiate()
@@ -24,7 +24,7 @@ func _ready():
 
 
 func _physics_process(_delta: float) -> void:
-	var target_pos := target.global_position
+	var target_pos :Vector3 = target.global_position
 	if lead_target:
 		# If you don't care about bullet drop then
 		# elevation_angle should be zero and 
@@ -40,7 +40,7 @@ func _physics_process(_delta: float) -> void:
 		# Look at target, but don't elevate toward it.
 		# This is rotating the gun, not the position where
 		# the bullet is instantiated.
-		var temp := Vector3(target_pos.x, global_position.y, target_pos.z)
+		var temp :Vector3 = Vector3(target_pos.x, global_position.y, target_pos.z)
 		look_at(temp, Vector3.UP)
 		set_firing_angle(target_pos)
 		pivot.rotation.x = elevation_angle
@@ -77,7 +77,7 @@ func _on_timer_timeout() -> void:
 	can_shoot = true
 
 
-func set_firing_angle(target_pos:Vector3):
+func set_firing_angle(target_pos:Vector3) -> void:
 	# Avoid divide by zero. Also there's no
 	# elevation needed if there's no bullet drop.
 	if bullet_drop == 0.0:

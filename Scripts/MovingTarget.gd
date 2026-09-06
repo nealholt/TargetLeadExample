@@ -1,8 +1,8 @@
 extends CharacterBody3D
 
-@export var speed := 150.0
-@export var move_x := true
-@export var acceleration := 0.0
+@export var speed :float = 150.0
+@export var move_x :bool = true
+@export var acceleration :float = 0.0
 
 func _physics_process(delta: float) -> void:
 	# Accelerate
